@@ -3,6 +3,24 @@
 ## 1 Problem 1 : Report Contiguos Dates		(https://leetcode.com/problems/report-contiguous-dates/ )
 <br>
 
+with cte as (select fail_date as 'date', 'failed' as 'period_state'
+from Failed
+Union
+select success_date as 'date', 'succeeded' as 'period_state'
+from Succeeded
+),
+cte2 as (
+select *, row_number() over(partition by period_state order by date) as rnk
+from cte)
+
+select period_state,
+min(date) as start_date,
+max(date) as end_date
+from cte2
+where date between '2019-01-01' and '2019-12-31'
+group by date_sub(date, interval rnk day), period_state
+order by start_date
+
 ### 
 
 ## 2 Problem 2 : Student Report By Geography		(https://leetcode.com/problems/students-report-by-geography/ )
@@ -32,7 +50,7 @@ from cteAs  right join cteAm on cteAs.rnk=cteAm.rnk
 <br>
 
 ### Solution Using Case When Statements
-# Write your MySQL query statement below
+
 #Date_format(pay_date. '%mm-Y')
 #avg(amount)
 #Group BY pay_month, department_id
